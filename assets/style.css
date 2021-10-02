@@ -3,7 +3,7 @@
 }
 header{
     height: 80px;
-    background-color: #C8C6C6;
+    background-color: #495464;
 }
 #title{
     margin-left: auto;
@@ -16,8 +16,10 @@ header{
 }
 #left-container{
     /* border: solid black 2px; */
-    background-color: #F0E5CF;
+    background-color: #E8E8E8;
     height: 100vh;
 }
 
-
+#right-container{
+    background-color: #F4F4F2;
+}
