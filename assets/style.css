@@ -3,12 +3,21 @@
 }
 header{
     height: 80px;
+    background-color: #C8C6C6;
 }
 #title{
     margin-left: auto;
     margin-right: auto;
 }
 
-#left-container{
-    border: solid black 2px;
+.recolored-button{
+    background-color: #4B6587;
+    color: #F7F6F2;
 }
+#left-container{
+    /* border: solid black 2px; */
+    background-color: #F0E5CF;
+    height: 100vh;
+}
+
+
