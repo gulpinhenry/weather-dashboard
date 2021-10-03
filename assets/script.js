@@ -1,6 +1,8 @@
 var savedHistoryEl = $("#saved-history");
 var searchFormEl = $("#search-form");
+var mainWeatherCardEl = $("#main-weather-card")
 var searchInputEl = $("#inlineFormInputName");
+
 var apiKey = "9090b9806c2ae1ae7a9126b7765063fa";
 
 //this is temporary
@@ -16,11 +18,47 @@ if(!localStorage.getItem(0))
     localStorage.setItem(7,"Cupertino");
     
 }
+function getUV(lon, lat){
+    let apiUrl = "https://api.openweathermap.org/data/2.5/onecall?lat=" + lat + "&lon="+ lon +  "&exclude=minutely,hourly,daily,alerts&units=imperial&appid=" +apiKey;
+    console.log(apiUrl);
+    fetch(apiUrl)
+        .then(function(response){
+            if(response.ok){
+                response.json().then(function (data){
+                    console.log(data);
+                    
+                    //add uv icon?
+                    $("#uv").text(data.current.uvi);
+                    
 
+                });
+            }
+        })
+        .catch(function(error){
+            alert("Unable to find city");
+        })
+}
+
+// render todays weather
+function renderWeather(data){
+    $("#city-name").text(data.name);
+    //TODO
+    //$("#date").text();
+    $("#temp").text(data.main.temp + "°F");
+    $("#humid").text(data.main.humidity +"%");
+    $("#win").text(data.wind.speed + " miles per hour");
+    // get UV
+    getUV(data.coord.lon, data.coord.lat);
+    
+}
+//render forecast
+function renderForecast(){
+    
+}
 
 //fetch current weather from api
 function getCurWeather(city){
-    let apiUrl = "https://api.openweathermap.org/data/2.5/weather?q=" + city + "&appid=" +apiKey;
+    let apiUrl = "https://api.openweathermap.org/data/2.5/weather?q=" + city + "&units=imperial&appid=" +apiKey;
     console.log(apiUrl);
     fetch(apiUrl)
         .then(function(response){
@@ -29,6 +67,7 @@ function getCurWeather(city){
                     console.log(data);
                     renderSearchButtons();
                     //render the card
+                    renderWeather(data);
                     return true;
                 });
             }
@@ -40,7 +79,7 @@ function getCurWeather(city){
 }
 // fetch forecast from api
 function getForecast(city){
-    let apiUrl = "https://api.openweathermap.org/data/2.5/forecast?q="+ city + "&appid=" +apiKey;
+    let apiUrl = "https://api.openweathermap.org/data/2.5/forecast?q="+ city + "&units=imperia&appid=" +apiKey;
 
     console.log(apiUrl);
     fetch(apiUrl)
@@ -49,6 +88,7 @@ function getForecast(city){
                 response.json().then(function (data){
                     console.log(data);
                     //render the card
+                    renderForecast(data);
                     return true;
                 });
             }
@@ -123,9 +163,7 @@ function savedHistoryHandler(event){
 savedHistoryEl.on("click", savedHistoryHandler);
 searchFormEl.on("submit", searchHandler);
 
-// render todays weather
 
-//render forecast
 
 //render starting page
 renderSearchButtons();
