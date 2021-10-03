@@ -4,14 +4,18 @@ var searchInputEl = $("#inlineFormInputName");
 var apiKey = "9090b9806c2ae1ae7a9126b7765063fa";
 
 //this is temporary
-localStorage.setItem(0,"Cupertino");
-localStorage.setItem(1,"New York City");
-localStorage.setItem(2,"Boston");
-localStorage.setItem(3,"Plano");
-localStorage.setItem(4,"Princeton");
-localStorage.setItem(5,"Fresno");
-localStorage.setItem(6,"Berkeley");
-localStorage.setItem(7,"Omaha");
+if(!localStorage.getItem(0))
+{
+    localStorage.setItem(0,"Omaha");
+    localStorage.setItem(1,"New York City");
+    localStorage.setItem(2,"Boston");
+    localStorage.setItem(3,"Plano");
+    localStorage.setItem(4,"Princeton");
+    localStorage.setItem(5,"Fresno");
+    localStorage.setItem(6,"Berkeley");
+    localStorage.setItem(7,"Cupertino");
+    
+}
 
 
 //fetch current weather from api
@@ -23,12 +27,15 @@ function getCurWeather(city){
             if(response.ok){
                 response.json().then(function (data){
                     console.log(data);
-                    //render the card, update the search buttons
+                    renderSearchButtons();
+                    //render the card
+                    return true;
                 });
             }
         })
         .catch(function(error){
             alert("Unable to find city");
+            return false;
         })
 }
 // fetch forecast from api
@@ -42,27 +49,52 @@ function getForecast(city){
                 response.json().then(function (data){
                     console.log(data);
                     //render the card
+                    return true;
                 });
             }
         })
         .catch(function(error){
             alert("Unable to find city");
+            return false;
+            
         })
 }
+
+function capitalizeFirstLetter(string) {
+    let arr = string.split(" ")
+    let build = "";
+    arr.forEach(i => build+= i.charAt(0).toUpperCase() + i.slice(1) + " ");
+
+    return build.trim();
+}
+
 // get input from search bar, event listener for search bar
 function searchHandler(event){
     event.preventDefault();
-    var cityName = searchInputEl.val().trim();
-    if(cityName){
-        getCurWeather(cityName);
-        getForecast(cityName);
-
-        searchInputEl.value = '';
+    var cityName = capitalizeFirstLetter(searchInputEl.val().trim());
+    searchInputEl.value = '';
+    if(getCurWeather(cityName) && getForecast(cityName))
+    {
+        for(let i = 0; i<localStorage.length;i++)
+        {
+            console.log(localStorage.getItem(i) + " vs " + cityName);
+            if(localStorage.getItem(i) == cityName)
+            {
+                console.log(i + " true");
+                return;
+            }
+            
+        }
+        for(let i = localStorage.length-1; i>0; i--)
+        {
+            localStorage.setItem(i, localStorage.getItem(i-1));
+        }
+        localStorage.setItem(0, cityName);
+        renderSearchButtons(); //this part doesnt work
+        
         //update local storage and the search buttons
-    }
-    else{
-        alert("Unable to find city");
-    }
+        // not sure why this doesnt work
+    }    
     
 }
 console.log("hi");
@@ -73,7 +105,7 @@ var renderSearchButtons = function(){
     for(let i = 0; i<localStorage.length; i++)
     {
         let curEl = savedHistoryEl.children().eq(i);
-        let name = localStorage.getItem(i);
+        let name = capitalizeFirstLetter(localStorage.getItem(i));
         curEl.attr("data-city", name);
         curEl.text(name);
     }
