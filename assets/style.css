@@ -1,5 +1,5 @@
 *{
-    
+    font-family: 'Architects Daughter', cursive;
 }
 header{
     height: 80px;
@@ -27,12 +27,23 @@ header{
     background-color: #F4F4F2;
 }
 
+#city-name{
+    font-size: 40px;
+    font-weight: bold;
+}
 #upper-right-container{
     padding: 20px 10px 20px 10px;
     height: 40vh;
     width: auto;
 }
-
+.weather{
+    font-size: 25px;
+}
+#uv{
+    padding: 0px 20px 0px 20px;
+    text-align: center;
+    border-radius: 2px;
+}
 #main-weather{
     width: 100%;
     background-color: #BBBFCA;

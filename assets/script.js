@@ -27,9 +27,17 @@ function getUV(lon, lat){
             if(response.ok){
                 response.json().then(function (data){
                     console.log(data);
-                    
+                    let index = data.current.uvi;
                     //add uv icon?
                     $("#uv").text(data.current.uvi);
+                    if(index<=2)
+                        $("#uv").css("background-color", "#7FFF00");
+                    else if(index<=5)
+                        $("#uv").css("background-color", "yellow");
+                    else if(index<=7)
+                        $("#uv").css("background-color", "coral");
+                    else
+                        $("#uv").css("background-color", "red");
                     
 
                 });
@@ -43,7 +51,9 @@ function getUV(lon, lat){
 // render todays weather
 function renderWeather(data){
     $("#city-name").text(data.name);
-    $("#date").text(data.dt);
+    let date = moment(data.dt, "X");
+    $("#date").text(date.format("MM/DD"));
+
     let iconUrl = "https://openweathermap.org/img/w/" + data.weather[0].icon + ".png";
     console.log(iconUrl);
     $("#today-symbol").attr("src", iconUrl);
@@ -55,16 +65,20 @@ function renderWeather(data){
     
 }
 //render forecast
+
+
 function renderForecast(data){
+    console.log(data.list.length);
     for(let i = 0; i<5; i++)
     {
+
         let cur = lowRightCont.children().eq(i);
-        cur.children().children(".fore-date").text(data.list[i].dt);
-        let iconUrl = "https://openweathermap.org/img/w/" + data.list[i].weather[0].icon + ".png";
+        let date = moment(data.list[i*8].dt_txt, "YYYY-MM-DD HH:mm:ss");
+        cur.children().children(".fore-date").text(date.format("MM/DD"));
+        let iconUrl = "https://openweathermap.org/img/w/" + data.list[i*8].weather[0].icon + ".png";
         cur.children().children(".fore-symbol").attr("src", iconUrl);
-        cur.children().children(".fore-temp").text("Temperature: " + data.list[i].main.temp + "°F");
-        cur.children().children(".fore-humid").text("Humidity: " + data.list[i].main.humidity +"%");
-        //console.log(data.list[i].weather.icon);
+        cur.children().children(".fore-temp").text("Temperature: " + data.list[i*8].main.temp + "°F");
+        cur.children().children(".fore-humid").text("Humidity: " + data.list[i*8].main.humidity +"%");
     }
 }
 
