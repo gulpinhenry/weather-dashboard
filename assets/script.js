@@ -43,8 +43,10 @@ function getUV(lon, lat){
 // render todays weather
 function renderWeather(data){
     $("#city-name").text(data.name);
-    //TODO
-    //$("#date").text();
+    $("#date").text(data.dt);
+    let iconUrl = "https://openweathermap.org/img/w/" + data.weather[0].icon + ".png";
+    console.log(iconUrl);
+    $("#today-symbol").attr("src", iconUrl);
     $("#temp").text(data.main.temp + "°F");
     $("#humid").text(data.main.humidity +"%");
     $("#win").text(data.wind.speed + " miles per hour");
@@ -57,8 +59,12 @@ function renderForecast(data){
     for(let i = 0; i<5; i++)
     {
         let cur = lowRightCont.children().eq(i);
-        cur.children().children(".fore-date").text(i);
-        console.log("yo");
+        cur.children().children(".fore-date").text(data.list[i].dt);
+        let iconUrl = "https://openweathermap.org/img/w/" + data.list[i].weather[0].icon + ".png";
+        cur.children().children(".fore-symbol").attr("src", iconUrl);
+        cur.children().children(".fore-temp").text("Temperature: " + data.list[i].main.temp + "°F");
+        cur.children().children(".fore-humid").text("Humidity: " + data.list[i].main.humidity +"%");
+        //console.log(data.list[i].weather.icon);
     }
 }
 
@@ -85,7 +91,7 @@ function getCurWeather(city){
 }
 // fetch forecast from api
 function getForecast(city){
-    let apiUrl = "https://api.openweathermap.org/data/2.5/forecast?q="+ city + "&units=imperia&appid=" +apiKey;
+    let apiUrl = "https://api.openweathermap.org/data/2.5/forecast?q="+ city + "&units=imperial&appid=" +apiKey;
 
     console.log(apiUrl);
     fetch(apiUrl)
