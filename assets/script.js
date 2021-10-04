@@ -6,7 +6,8 @@ var lowRightCont = $("#lower-right-container");
 
 var apiKey = "9090b9806c2ae1ae7a9126b7765063fa";
 
-//this is temporary
+
+// checks to see if there are already saved values
 if(!localStorage.getItem(0))
 {
     localStorage.setItem(0,"Omaha");
@@ -21,14 +22,13 @@ if(!localStorage.getItem(0))
 }
 function getUV(lon, lat){
     let apiUrl = "https://api.openweathermap.org/data/2.5/onecall?lat=" + lat + "&lon="+ lon +  "&exclude=minutely,hourly,daily,alerts&units=imperial&appid=" +apiKey;
-    console.log(apiUrl);
+    //console.log(apiUrl);
     fetch(apiUrl)
         .then(function(response){
             if(response.ok){
                 response.json().then(function (data){
-                    console.log(data);
+                    //console.log(data);
                     let index = data.current.uvi;
-                    //add uv icon?
                     $("#uv").text(data.current.uvi);
                     if(index<=2)
                         $("#uv").css("background-color", "#7FFF00");
@@ -43,9 +43,6 @@ function getUV(lon, lat){
                 });
             }
         })
-        .catch(function(error){
-            alert("Unable to find city");
-        })
 }
 
 // render todays weather
@@ -53,14 +50,13 @@ function renderWeather(data){
     $("#city-name").text(data.name);
     let date = moment(data.dt, "X");
     $("#date").text(date.format("MM/DD"));
-
     let iconUrl = "https://openweathermap.org/img/w/" + data.weather[0].icon + ".png";
-    console.log(iconUrl);
+    //console.log(iconUrl);
     $("#today-symbol").attr("src", iconUrl);
     $("#temp").text(data.main.temp + "°F");
     $("#humid").text(data.main.humidity +"%");
     $("#win").text(data.wind.speed + " miles per hour");
-    // get UV
+    // get UV text
     getUV(data.coord.lon, data.coord.lat);
     
 }
@@ -68,10 +64,8 @@ function renderWeather(data){
 
 
 function renderForecast(data){
-    console.log(data.list.length);
     for(let i = 0; i<5; i++)
     {
-
         let cur = lowRightCont.children().eq(i);
         let date = moment(data.list[i*8].dt_txt, "YYYY-MM-DD HH:mm:ss");
         cur.children().children(".fore-date").text(date.format("MM/DD"));
@@ -85,45 +79,58 @@ function renderForecast(data){
 //fetch current weather from api
 function getCurWeather(city){
     let apiUrl = "https://api.openweathermap.org/data/2.5/weather?q=" + city + "&units=imperial&appid=" +apiKey;
-    console.log(apiUrl);
+    //console.log(apiUrl);
+    valid = true;
     fetch(apiUrl)
         .then(function(response){
             if(response.ok){
                 response.json().then(function (data){
-                    console.log(data);
-                    renderSearchButtons();
-                    //render the card
+                    //console.log(data);
                     renderWeather(data);
+                    return true;
                     
                 });
             }
+            else{
+                
+                console.log("error: " + response.statusText);
+                alert("invalid city name!");
+                return false;
+                //printstacktrace
+                //console.trace();
+            }
         })
         .catch(function(error){
-            console.log("Unable to find city");
+            console.log("catch");
             
-        })
+        });
 }
 // fetch forecast from api
 function getForecast(city){
     let apiUrl = "https://api.openweathermap.org/data/2.5/forecast?q="+ city + "&units=imperial&appid=" +apiKey;
 
-    console.log(apiUrl);
+    //console.log(apiUrl);
     fetch(apiUrl)
         .then(function(response){
             if(response.ok){
                 response.json().then(function (data){
-                    console.log(data);
+                    //console.log(data);
                     //render the card
                     renderForecast(data);
+                    return true;
                     
                 });
             }
+            else{
+                console.log("helkp");
+                return false;
+            }
         })
-        // .catch(function(error){
-        //     alert("Unable to find city");
+        .catch(function(error){
+           alert("Unable to find city");
             
             
-        // })
+        })
 }
 
 function capitalizeFirstLetter(string) {
@@ -141,14 +148,14 @@ function searchHandler(event){
     searchInputEl.value = '';
     if(cityName)
     {
-        getCurWeather(cityName);
-        getForecast(cityName);
+        console.log(getCurWeather(cityName));
+        console.log(getForecast(cityName));
         for(let i = 0; i<localStorage.length;i++)
         {
-            console.log(localStorage.getItem(i) + " vs " + cityName);
+            //console.log(localStorage.getItem(i) + " vs " + cityName);
             if(localStorage.getItem(i) == cityName)
             {
-                console.log(i + " true");
+                //console.log(i + " true");
                 return;
             }
             
