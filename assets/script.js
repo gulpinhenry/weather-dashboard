@@ -2,6 +2,7 @@ var savedHistoryEl = $("#saved-history");
 var searchFormEl = $("#search-form");
 var mainWeatherCardEl = $("#main-weather-card")
 var searchInputEl = $("#inlineFormInputName");
+var lowRightCont = $("#lower-right-container");
 
 var apiKey = "9090b9806c2ae1ae7a9126b7765063fa";
 
@@ -52,8 +53,13 @@ function renderWeather(data){
     
 }
 //render forecast
-function renderForecast(){
-    
+function renderForecast(data){
+    for(let i = 0; i<5; i++)
+    {
+        let cur = lowRightCont.children().eq(i);
+        cur.children().children(".fore-date").text(i);
+        console.log("yo");
+    }
 }
 
 //fetch current weather from api
@@ -68,13 +74,13 @@ function getCurWeather(city){
                     renderSearchButtons();
                     //render the card
                     renderWeather(data);
-                    return true;
+                    
                 });
             }
         })
         .catch(function(error){
-            alert("Unable to find city");
-            return false;
+            console.log("Unable to find city");
+            
         })
 }
 // fetch forecast from api
@@ -89,15 +95,15 @@ function getForecast(city){
                     console.log(data);
                     //render the card
                     renderForecast(data);
-                    return true;
+                    
                 });
             }
         })
-        .catch(function(error){
-            alert("Unable to find city");
-            return false;
+        // .catch(function(error){
+        //     alert("Unable to find city");
             
-        })
+            
+        // })
 }
 
 function capitalizeFirstLetter(string) {
@@ -111,10 +117,12 @@ function capitalizeFirstLetter(string) {
 // get input from search bar, event listener for search bar
 function searchHandler(event){
     event.preventDefault();
-    var cityName = capitalizeFirstLetter(searchInputEl.val().trim());
+    let cityName = capitalizeFirstLetter(searchInputEl.val().trim());
     searchInputEl.value = '';
-    if(getCurWeather(cityName) && getForecast(cityName))
+    if(cityName)
     {
+        getCurWeather(cityName);
+        getForecast(cityName);
         for(let i = 0; i<localStorage.length;i++)
         {
             console.log(localStorage.getItem(i) + " vs " + cityName);
@@ -134,10 +142,14 @@ function searchHandler(event){
         
         //update local storage and the search buttons
         // not sure why this doesnt work
-    }    
+    }   
+    else{
+        alert("Invalid City Name!");
+    }
     
 }
-console.log("hi");
+
+//console.log("hi");
 
 // render search buttons, from local storage
 var renderSearchButtons = function(){
