@@ -22,12 +22,10 @@ if(!localStorage.getItem(0))
 }
 function getUV(lon, lat){
     let apiUrl = "https://api.openweathermap.org/data/2.5/onecall?lat=" + lat + "&lon="+ lon +  "&exclude=minutely,hourly,daily,alerts&units=imperial&appid=" +apiKey;
-    //console.log(apiUrl);
     fetch(apiUrl)
         .then(function(response){
             if(response.ok){
                 response.json().then(function (data){
-                    //console.log(data);
                     let index = data.current.uvi;
                     $("#uv").text(data.current.uvi);
                     if(index<=2)
@@ -48,6 +46,7 @@ function getUV(lon, lat){
 // render todays weather
 function renderWeather(data){
     $("#city-name").text(data.name);
+    updateButtons(data.name);
     let date = moment(data.dt, "X");
     $("#date").text(date.format("MM/DD"));
     let iconUrl = "https://openweathermap.org/img/w/" + data.weather[0].icon + ".png";
@@ -58,6 +57,7 @@ function renderWeather(data){
     $("#win").text(data.wind.speed + " miles per hour");
     // get UV text
     getUV(data.coord.lon, data.coord.lat);
+    
     
 }
 //render forecast
@@ -92,18 +92,10 @@ function getCurWeather(city){
                 });
             }
             else{
-                
-                console.log("error: " + response.statusText);
                 alert("invalid city name!");
-                return false;
-                //printstacktrace
-                //console.trace();
             }
         })
-        .catch(function(error){
-            console.log("catch");
-            
-        });
+
 }
 // fetch forecast from api
 function getForecast(city){
@@ -114,22 +106,10 @@ function getForecast(city){
         .then(function(response){
             if(response.ok){
                 response.json().then(function (data){
-                    //console.log(data);
-                    //render the card
                     renderForecast(data);
-                    return true;
                     
                 });
             }
-            else{
-                console.log("helkp");
-                return false;
-            }
-        })
-        .catch(function(error){
-           alert("Unable to find city");
-            
-            
         })
 }
 
@@ -141,6 +121,24 @@ function capitalizeFirstLetter(string) {
     return build.trim();
 }
 
+function updateButtons(cityName){
+    for(let i = 0; i<localStorage.length;i++)
+    {
+        //console.log(localStorage.getItem(i) + " vs " + cityName);
+        if(localStorage.getItem(i) == cityName)
+        {
+            return;
+        }
+        
+    }
+    for(let i = localStorage.length-1; i>0; i--)
+    {
+        localStorage.setItem(i, localStorage.getItem(i-1));
+    }
+    localStorage.setItem(0, cityName);
+    renderSearchButtons();
+    
+}
 // get input from search bar, event listener for search bar
 function searchHandler(event){
     event.preventDefault();
@@ -148,27 +146,8 @@ function searchHandler(event){
     searchInputEl.value = '';
     if(cityName)
     {
-        console.log(getCurWeather(cityName));
-        console.log(getForecast(cityName));
-        for(let i = 0; i<localStorage.length;i++)
-        {
-            //console.log(localStorage.getItem(i) + " vs " + cityName);
-            if(localStorage.getItem(i) == cityName)
-            {
-                //console.log(i + " true");
-                return;
-            }
-            
-        }
-        for(let i = localStorage.length-1; i>0; i--)
-        {
-            localStorage.setItem(i, localStorage.getItem(i-1));
-        }
-        localStorage.setItem(0, cityName);
-        renderSearchButtons(); //this part doesnt work
-        
-        //update local storage and the search buttons
-        // not sure why this doesnt work
+        getCurWeather(cityName);
+        getForecast(cityName);
     }   
     else{
         alert("Invalid City Name!");
@@ -176,7 +155,6 @@ function searchHandler(event){
     
 }
 
-//console.log("hi");
 
 // render search buttons, from local storage
 var renderSearchButtons = function(){
